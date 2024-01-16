@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+// import { useHistory } from 'react-router-dom';
 import AddStudentForm from './components/AddStudentForm';
 import AddTeacherForm from './components/AddTeacherForm';
 import Login from './components/Login';
@@ -25,7 +25,13 @@ import TeacherDashboard from './components/TeacherDashboard';
 
 
 const App = () => {
-  const [user, setUser] = useState(null);
+
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem('user');
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
+
+  // const [user, setUser] = useState(null);
   const [showAddStudentForm, setShowAddStudentForm] = useState(false);
   const [showAddTeacherForm, setShowAddTeacherForm] = useState(false);
   const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
@@ -35,6 +41,7 @@ const App = () => {
   const handleLogin = (user,token) => {
     setUser(user);
     localStorage.setItem('jwtToken', token);
+    localStorage.setItem('user', JSON.stringify(user));// Store user data
     toast.success('Login successful!');
     console.log('Token stored: ', token);
     
@@ -43,6 +50,8 @@ const App = () => {
       
 
   const handleLogout = () => {
+    localStorage.removeItem('jwtToken');
+    localStorage.removeItem('user');
     setShowLogoutConfirmation(true);
   };
 
@@ -57,10 +66,10 @@ const App = () => {
     // Send a DELETE request to the logout endpoint
     fetch('http://localhost:3000/sessions', {
       method: 'DELETE',
-      credentials: 'include', // Include credentials for the session to be sent
+      credentials: 'include', 
       headers: {
-        // 'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
     },  
     })
       .then(response => {

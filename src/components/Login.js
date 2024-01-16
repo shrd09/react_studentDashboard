@@ -41,6 +41,12 @@ const Login = ({ onLogin }) => {
     } else {
       console.error('CSRF Token meta tag not found!');
     }
+    const storedToken = localStorage.getItem('jwtToken');
+    if (storedToken) {
+      console.log('Token retrieved from localStorage:', storedToken);
+      // You may want to check if the token is still valid and not expired
+      // If it's still valid, you can redirect the user to the appropriate page
+    }
   }, []);
   
   const getToken = () => {
@@ -48,7 +54,7 @@ const Login = ({ onLogin }) => {
   };
 
   const token = getToken();
-  console.log('Token:', token);
+  console.log('Token generated:', token);
 
   const fetchUserRole = async () => {
     try {
