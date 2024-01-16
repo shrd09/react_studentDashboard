@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import {jwtDecode} from 'jwt-decode'; 
 import {
   Container,
   Grid,
@@ -6,22 +7,13 @@ import {
   Button,
   Box,
   Paper,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Checkbox,
-  FormControlLabel,
-  Popover,
 } from '@mui/material';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-// import { useHistory } from 'react-router-dom';
-import AddStudentForm from './components/AddStudentForm';
-import AddTeacherForm from './components/AddTeacherForm';
 import Login from './components/Login';
 import StudentDashboard from './components/StudentDashboard';
 import TeacherDashboard from './components/TeacherDashboard';
+import AdminDashboard from './components/AdminDashboard';
 
 
 const App = () => {
@@ -31,12 +23,8 @@ const App = () => {
     return storedUser ? JSON.parse(storedUser) : null;
   });
 
-  // const [user, setUser] = useState(null);
-  const [showAddStudentForm, setShowAddStudentForm] = useState(false);
-  const [showAddTeacherForm, setShowAddTeacherForm] = useState(false);
   const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
   const [logoutMessage, setLogoutMessage] = useState('');
-  const [anchorEl, setAnchorEl] = useState(null);
 
   const handleLogin = (user,token) => {
     setUser(user);
@@ -47,7 +35,37 @@ const App = () => {
     
   };
 
-      
+    
+  const checkTokenExpiration = () => {
+    const token = getToken();
+    if (token) {
+      try {
+        const decodedToken = jwtDecode(token);
+        const currentTime = Date.now() / 1000; // Convert milliseconds to seconds
+
+        if (decodedToken.exp && decodedToken.exp < currentTime) {
+          // Token has expired
+          setUser(null);
+          toast.info('Your session has expired. Please log in again.');
+        }
+      } catch (error) {
+        console.error('Error decoding token:', error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    // Check token expiration when the component mounts
+    checkTokenExpiration();
+
+    // Set up a timer to periodically check token expiration
+    const tokenCheckInterval = setInterval(checkTokenExpiration, 60000); // Check every minute
+
+    // Clean up the interval when the component unmounts
+    return () => clearInterval(tokenCheckInterval);
+  }, []);
+
+
 
   const handleLogout = () => {
     localStorage.removeItem('jwtToken');
@@ -96,39 +114,6 @@ const App = () => {
     setShowLogoutConfirmation(false);
   };
 
-  const [registrationSuccess, setRegistrationSuccess] = useState(false);
-
-  const handleAddStudent = (data) => {
-    // Perform to add student using data
-    console.log('Adding student:', data);
-    setRegistrationSuccess(true);
-    setShowAddStudentForm(false);
-    setAnchorEl(null);
-  };
-
-  const handleAddTeacher = (data) => {
-    // Perform to add teacher using data
-    console.log('Adding teacher:', data);
-    setShowAddTeacherForm(false);
-    setAnchorEl(null);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const open = Boolean(anchorEl);
-  const id = open ? 'add-menu-popover' : undefined;
-
-  const handleCancel = () => {
-    setShowAddStudentForm(false);
-    setShowAddTeacherForm(false);
-  };
-
 
   return (
     <Container maxWidth="xl" sx={{ mt: 4 }}>
@@ -136,123 +121,14 @@ const App = () => {
         <Login onLogin={handleLogin} />
       ) : (
         <>
-          {user.role === 'admin' && (
-            <>
-            <Grid item xs={12}>
-                <Typography variant="h4" gutterBottom align="center">
-                  Welcome, Admin!
-                </Typography>
-            </Grid>
-            <br/>
-            <Grid container spacing={2} justifyContent="center" alignItems="center">
-              <Button
-                aria-describedby={id}
-                variant="contained"
-                color="primary"
-                onClick={handleClick}
-              >
-                Add
-              </Button>
-              </Grid>
-              <Popover
-                id={id}
-                open={open}
-                anchorEl={anchorEl}
-                onClose={handleClose}
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'center',
-                }}
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'center',
-                }}
-              >
-                <Paper>
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    color="primary"
-                    onClick={() => {
-                      setShowAddStudentForm(true);
-                      handleClose();
-                    }}
-                  >
-                    Add Student
-                  </Button>
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    color="primary"
-                    onClick={() => {
-                      setShowAddTeacherForm(true);
-                      handleClose();
-                    }}
-                  >
-                    Add Teacher
-                  </Button>
-                </Paper>
-              </Popover>
-              <br/>
-              <br/>
-              {user.role === 'admin' && (
-            <Grid container spacing={2} justifyContent="center" alignItems="center">
-              <Grid item xs={1}>
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  fullWidth
-                  onClick={handleLogout}
-                >
-                  Logout
-                </Button>
-              </Grid>
-            </Grid>
-          )}
-            </>
-          )}
+          {user.role === 'admin' && <AdminDashboard user={user} handleLogout={handleLogout} />}
 
           { user.role === 'student' && (
-            // If the user is a student, show the student dashboard
             <StudentDashboard user={user} handleLogout={handleLogout} />
           )} 
           {user.role === 'teacher' && (
-            // If the user is a teacher, show the teacher dashboard
             <TeacherDashboard user={user} handleLogout={handleLogout} />
           )} 
-
-          {(showAddStudentForm || showAddTeacherForm) && (
-            <Dialog open={showAddStudentForm || showAddTeacherForm} onClose={() => handleCancel()}>
-              <DialogTitle>Add {showAddStudentForm ? 'Student' : 'Teacher'}</DialogTitle>
-              <DialogContent>
-                {showAddStudentForm && <AddStudentForm onSubmit={handleAddStudent} />}
-                {showAddTeacherForm && <AddTeacherForm onSubmit={handleAddTeacher} />}
-              </DialogContent>
-              <DialogActions>
-                <Button onClick={() => handleCancel()} color="secondary">
-                  Cancel
-                </Button>
-              </DialogActions>
-            </Dialog>
-          )}
-
-
-          {registrationSuccess && (
-              <Box mt={2}>
-                <Typography variant="h6" color="success">
-                  Student successfully registered!
-                </Typography>
-              </Box>
-            )}
-
-            {user.role !== 'admin' && user.role !== 'student' && user.role !== 'teacher' && (
-              // Handle other roles
-              <div>
-                <h2>Welcome, {user.role}!</h2>
-                {/* Other components for non-admin, non-student, non-teacher roles */}
-                <button onClick={handleLogout}>Logout</button>
-              </div>
-            )}
 
             {/* Logout Confirmation Dialog */}
             {showLogoutConfirmation && (

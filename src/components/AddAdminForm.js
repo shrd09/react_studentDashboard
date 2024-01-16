@@ -4,7 +4,7 @@ import Input from './input';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const AddStudentForm = () => {
+const AddAdminForm = ({onClose}) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
@@ -26,13 +26,12 @@ const AddStudentForm = () => {
                     'Authorization': `Bearer ${token}`,
                 },
                 
-                body: JSON.stringify({email:email,password:password, role:'student'}),
+                body: JSON.stringify({email:email,password:password, role:'admin'}),
                 
             });
 
             if (response.ok){
-                toast.success('Student created sucessfully!');
-                console.log('Student created sucessfully');
+                toast.success('Admin created sucessfully!');
                 const data = await response.json();
 
             // Check if the response contains the userId property
@@ -47,8 +46,8 @@ const AddStudentForm = () => {
             }
             }
             else{
-              toast.success("Failed to create student");
-                console.error("Failed to create student");
+              toast.success("Failed to create admin");
+                console.error("Failed to create admin");
             }
         }
         catch(error){
@@ -60,41 +59,19 @@ const AddStudentForm = () => {
     return (
         <Paper elevation={3} style={{ padding: '20px', maxWidth: '400px', margin: 'auto', marginTop: '20px' }}>
           <Typography variant="h5" align="center" gutterBottom>
-            Create Student
+            Create Admin
           </Typography>
           <form onSubmit={handleSubmit}>
         <Input label="Email" type="email" value={email} onChange={setEmail} />
         <Input label="Password" type="password" value={password} onChange={setPassword} />
         <Button type="submit" variant="contained" color="primary" fullWidth style={{ marginTop: '20px' }}>
-          Create Student
+          Create Admin
         </Button>
       </form>
-
-          {/* <form onSubmit={handleSubmit}>
-            <TextField
-              label="Email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              fullWidth
-              margin="normal"
-            />
-            <TextField
-              label="Password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              fullWidth
-              margin="normal"
-            />
-            <Button type="submit" variant="contained" color="primary" fullWidth style={{ marginTop: '20px' }}>
-              Create Student
-            </Button>
-          </form> */}
           <ToastContainer autoClose={4000} />
         </Paper>
       );
     };
 
-    export default AddStudentForm;
+    export default AddAdminForm;
 
