@@ -37,7 +37,6 @@ const AddCourses = () => {
     };
 
     useEffect(() => {
-        // Call fetchTeachersData when the component mounts
         fetchTeachersData();
       }, []);
 
@@ -91,7 +90,7 @@ const AddCourses = () => {
               <option value="" disabled>Select Teacher</option>
               {teachers.map((teacher) => (
                 <option key={teacher.user_id} value={teacher.user_id}>
-                  {teacher.user_id}
+                  {teacher.teacher_name}
                 </option>
               ))}
             </select>

@@ -194,7 +194,7 @@ const AdminDashboard = ({ user, handleLogout }) =>{
         <Button
           aria-describedby={id}
           variant="contained"
-          color="primary"
+          color="inherit"
           onClick={handleClick}
         >
           Add
@@ -217,24 +217,24 @@ const AdminDashboard = ({ user, handleLogout }) =>{
         <Paper>
           <Button
             fullWidth
-            variant="contained"
-            color="primary"
+            variant="outlined"
+            color="inherit"
             onClick={handleAddStudent}
           >
             Add Student
           </Button>
           <Button
             fullWidth
-            variant="contained"
-            color="primary"
+            variant="outlined"
+            color="inherit"
             onClick={handleAddTeacher}
           >
             Add Teacher
           </Button>
           <Button
             fullWidth
-            variant="contained"
-            color="primary"
+            variant="outlined"
+            color="inherit"
             onClick={handleAddAdmin}
           >
             Add Admin
@@ -245,16 +245,7 @@ const AdminDashboard = ({ user, handleLogout }) =>{
       <br />
       <br />
       <Grid container spacing={2} justifyContent="center" alignItems="center">
-        <Grid item xs={1}>
-          <Button
-            variant="outlined"
-            color="secondary"
-            fullWidth
-            onClick={handleLogout}
-          >
-            Logout
-          </Button>
-        </Grid>
+        
       </Grid>
 
       {(showAddStudentForm || showAddTeacherForm || showAddAdminForm) && (
@@ -274,26 +265,28 @@ const AdminDashboard = ({ user, handleLogout }) =>{
           )}
 
           <Button
-        variant="contained"
-        color="primary"
+        variant="outlined"
+        color="inherit"
         onClick={handleShowAllUsers}
       >
         Show All Users
       </Button>
       <ul>
-  {users.map((user) => (
-    <li key={user.id}>
-      Email: {user.email} - Role: {user.role}{' '}
-    </li>
-  ))}
-</ul>
-<Button
+        {users.map((user) => (
+          <li key={user.id}>
+            <b>Email:</b> <i>{user.email}</i> - <b>Role:</b> <i>{user.role}</i>{' '}
+          </li>
+        ))}
+      </ul>
+      <Button
         variant="outlined"
-        color="primary"
+        color="inherit"
         onClick={() => handleUpdateUserClick(user)}
       >
         Update
       </Button>
+      <br/>
+      <br/>
       {showUpdateUserForm && updatedUser && (
         <UpdateUserForm
           user={updatedUser}
@@ -302,7 +295,7 @@ const AdminDashboard = ({ user, handleLogout }) =>{
         />
       )}
 
-    <Button variant="contained" color="primary" onClick={handleDeleteUser}>
+<Button variant="outlined" color="inherit" onClick={handleDeleteUser}>
         Delete Users
       </Button>
     <Dialog open={showDeleteDialog} onClose={handleCancelDelete}>
@@ -324,6 +317,16 @@ const AdminDashboard = ({ user, handleLogout }) =>{
           </Button>
         </DialogActions>
       </Dialog>
+      <Grid item xs={1}>
+      <br/>
+          <Button
+            variant="outlined"
+            color="inherit"
+            onClick={handleLogout}
+          >
+            Logout
+          </Button>
+        </Grid>
     </div>
     );
 };

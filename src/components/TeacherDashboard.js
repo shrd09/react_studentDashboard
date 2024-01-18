@@ -322,7 +322,9 @@ const TeacherDashboard = ({ user ,handleLogout}) => {
       </Grid>
 
       <Grid item xs={6}>
-        <Typography variant="h6" gutterBottom><b>Your Courses:</b></Typography>
+        <Typography variant="h6" gutterBottom>
+          <b>Your Courses:</b>
+        </Typography>
         <List>
           {courses.map((course) => (
             <div key={course.user_id}>
@@ -338,6 +340,14 @@ const TeacherDashboard = ({ user ,handleLogout}) => {
                   {selectedCourseRegisteredStudents.map((student) => (
                     <ListItem key={student.id}>
                       <ListItemText primary={`Student: ${student.student_name}`} />
+                      {/* Add Update Marks button for each student */}
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => handleUpdateMarks(student.enrollment_id)} 
+                      >
+                        Update Marks
+                      </Button>
                     </ListItem>
                   ))}
                 </List>
@@ -348,25 +358,27 @@ const TeacherDashboard = ({ user ,handleLogout}) => {
       </Grid>
       <Grid item xs={6}>
         {/* Dialog for updating marks */}
-      <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
-        <DialogTitle>Update Marks</DialogTitle>
-        <DialogContent>
-          <TextField
-            label="Marks (out of 100)"
-            value={inputMarks}
-            onChange={(e) => setInputMarks(e.target.value)}
-          />
-          
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleDialogSubmit} color="primary">
-            Submit
-          </Button>
-        </DialogActions>
-      </Dialog>
+        <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
+          <DialogTitle>Update Marks</DialogTitle>
+          <DialogContent>
+            <TextField
+              label="Marks (out of 100)"
+              value={inputMarks}
+              onChange={(e) => {
+                setInputMarks(e.target.value);
+                // handleUpdateMarks(selectedEnrollmentId); // Remove this line
+              }}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDialog} color="primary">
+              Cancel
+            </Button>
+            <Button onClick={handleDialogSubmit} color="primary">
+              Submit
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Grid>
 
       <Grid item xs={1}>
@@ -377,7 +389,6 @@ const TeacherDashboard = ({ user ,handleLogout}) => {
     </Grid>
   );
 };
-
 export default TeacherDashboard;
 
 

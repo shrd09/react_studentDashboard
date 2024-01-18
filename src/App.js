@@ -134,7 +134,7 @@ const App = () => {
             {showLogoutConfirmation && (
               <Paper elevation={10} sx={{ marginTop: 4, padding: 2 }}>
                 <Typography variant="h6">Are you sure you want to logout?</Typography>
-                <Button variant="contained" color="primary" onClick={confirmLogout}>
+                <Button variant="contained" color="inherit" onClick={confirmLogout}>
                   Yes
                 </Button>
                 <Button variant="outlined" color="secondary" onClick={cancelLogout}>

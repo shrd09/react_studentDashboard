@@ -39,7 +39,6 @@ const Login = ({ onLogin }) => {
       setCsrfToken(csrfMetaTag.content);
       console.log('CSRF Token:', csrfMetaTag.content);
     } else {
-      // console.error('CSRF Token meta tag not found!');
     }
     const storedToken = localStorage.getItem('jwtToken');
     if (storedToken) {
@@ -52,7 +51,6 @@ const Login = ({ onLogin }) => {
   };
 
   const token = getToken();
-  console.log('Token generated:', token);
 
   const fetchUserRole = async () => {
     try {
@@ -68,7 +66,6 @@ const Login = ({ onLogin }) => {
         setRole(data.role);
         return data.role;
       } else {
-        // toast.error('Failed to fetch user role')
         console.error('Failed to fetch user role');
         return null;
       }
@@ -100,14 +97,10 @@ const Login = ({ onLogin }) => {
 
       if (response.ok) {
         const {user, token, message } = await response.json();
-        console.log('User Object:', user);
-        console.log('Token: ',token);
         console.log(message);
-        // toast.success(message);
         onLogin(user, token); // Pass the user data to the parent component
         
       } else {
-        // alert("Login failed");
         console.error('Login failed');
         toast.error('Login failed. Please check your credentials.');
       }
@@ -127,13 +120,16 @@ const Login = ({ onLogin }) => {
             Login
           </Typography>
           <StyledForm onSubmit={handleSubmit}>
-          <TextField label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} fullWidth />
+          <TextField label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} fullWidth required/>
        <br />
-       <TextField label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} fullWidth />
+       <TextField label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} fullWidth required />
        <br />
             <StyledButton type="submit" variant="contained" color="primary" fullWidth>
               Login
             </StyledButton>
+            {/* <Button type="submit" variant="outlined" color="secondary" fullWidth>
+              Reset Password
+            </Button> */}
           </StyledForm>
         </StyledPaper>
       </Grid>
