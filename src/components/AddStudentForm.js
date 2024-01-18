@@ -42,13 +42,13 @@ const AddStudentForm = () => {
                 setEmail("");
                 setPassword("");
             } else {
-              toast.success('User ID not found in the response:', data);
-                console.error('User ID not found in the response:', data);
+              toast.error('User ID not found in the response:', data);
+                // console.error('User ID not found in the response:', data);
             }
             }
             else{
-              toast.success("Failed to create student");
-                console.error("Failed to create student");
+              toast.error("Failed to create student");
+                // console.error("Failed to create student");
             }
         }
         catch(error){
@@ -69,29 +69,7 @@ const AddStudentForm = () => {
           Create Student
         </Button>
       </form>
-
-          {/* <form onSubmit={handleSubmit}>
-            <TextField
-              label="Email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              fullWidth
-              margin="normal"
-            />
-            <TextField
-              label="Password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              fullWidth
-              margin="normal"
-            />
-            <Button type="submit" variant="contained" color="primary" fullWidth style={{ marginTop: '20px' }}>
-              Create Student
-            </Button>
-          </form> */}
-          <ToastContainer autoClose={4000} />
+        <ToastContainer autoClose={4000} />
         </Paper>
       );
     };

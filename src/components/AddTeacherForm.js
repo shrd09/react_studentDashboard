@@ -1,6 +1,6 @@
 // src/components/NewTeacherForm.js
 import React, { useState } from 'react';
-import { TextField, Button, Typography, Paper } from '@mui/material';
+import { Button, Typography, Paper } from '@mui/material';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Input from './input';
@@ -41,7 +41,7 @@ const NewTeacherForm = () => {
         setEmail("");
         setPassword("");
       } else {
-        toast.success('User ID not found in the response:', data);
+        toast.error('User ID not found in the response:', data);
         console.error('User ID not found in the response:', data);
       }
       } else {

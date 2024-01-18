@@ -39,13 +39,11 @@ const Login = ({ onLogin }) => {
       setCsrfToken(csrfMetaTag.content);
       console.log('CSRF Token:', csrfMetaTag.content);
     } else {
-      console.error('CSRF Token meta tag not found!');
+      // console.error('CSRF Token meta tag not found!');
     }
     const storedToken = localStorage.getItem('jwtToken');
     if (storedToken) {
       console.log('Token retrieved from localStorage:', storedToken);
-      // You may want to check if the token is still valid and not expired
-      // If it's still valid, you can redirect the user to the appropriate page
     }
   }, []);
   
@@ -70,6 +68,7 @@ const Login = ({ onLogin }) => {
         setRole(data.role);
         return data.role;
       } else {
+        // toast.error('Failed to fetch user role')
         console.error('Failed to fetch user role');
         return null;
       }
@@ -131,15 +130,6 @@ const Login = ({ onLogin }) => {
           <TextField label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} fullWidth />
        <br />
        <TextField label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} fullWidth />
-       <br />
-       {/* <FormControl fullWidth>
-         <InputLabel>Role</InputLabel>
-         <Select value={role} onChange={(e) => setRole(e.target.value)} fullWidth>
-           <MenuItem value="student">Student</MenuItem>
-           <MenuItem value="teacher">Teacher</MenuItem>
-           <MenuItem value="admin">Admin</MenuItem>
-         </Select>
-       </FormControl> */}
        <br />
             <StyledButton type="submit" variant="contained" color="primary" fullWidth>
               Login

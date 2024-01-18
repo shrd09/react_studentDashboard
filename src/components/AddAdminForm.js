@@ -46,8 +46,8 @@ const AddAdminForm = ({onClose}) => {
             }
             }
             else{
-              toast.success("Failed to create admin");
-                console.error("Failed to create admin");
+              toast.error("Failed to create admin");
+                // console.error("Failed to create admin");
             }
         }
         catch(error){

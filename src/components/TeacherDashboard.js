@@ -37,6 +37,7 @@ const TeacherDashboard = ({ user ,handleLogout}) => {
     phone_no: '',
   });
 
+  const [selectedCourseRegisteredStudents, setSelectedCourseRegisteredStudents] = useState([]);
 
   const handleOpenDialog = (enrollmentId) => {
     setSelectedEnrollmentId(enrollmentId);
@@ -48,6 +49,7 @@ const TeacherDashboard = ({ user ,handleLogout}) => {
     setInputMarks('');
     setIsDialogOpen(false);
   };
+
 
   const handleCourseClick = async (courseId) => {
     console.log('Course clicked:', courseId);
@@ -64,6 +66,7 @@ const TeacherDashboard = ({ user ,handleLogout}) => {
         const data = await response.json();
         console.log('Registered students:', data);
         setRegisteredStudents(data);
+        setSelectedCourseRegisteredStudents(data);
       } else {
         console.error('Failed to fetch registered students for the course');
       }
@@ -322,75 +325,38 @@ const TeacherDashboard = ({ user ,handleLogout}) => {
         <Typography variant="h6" gutterBottom><b>Your Courses:</b></Typography>
         <List>
           {courses.map((course) => (
-            <ListItem key={course.user_id} button onClick={() => handleCourseClick(course.id)}>
-              <ListItemText primary={course.course_name} />
-            </ListItem>
+            <div key={course.user_id}>
+              <Button
+                variant="outlined"
+                onClick={() => handleCourseClick(course.id)}
+                fullWidth
+              >
+                {course.course_name}
+              </Button>
+              {selectedCourseId === course.id && (
+                <List>
+                  {selectedCourseRegisteredStudents.map((student) => (
+                    <ListItem key={student.id}>
+                      <ListItemText primary={`Student: ${student.student_name}`} />
+                    </ListItem>
+                  ))}
+                </List>
+              )}
+            </div>
           ))}
         </List>
       </Grid>
-
       <Grid item xs={6}>
-        <Typography variant="h6" gutterBottom>Enrollments and Marks:</Typography>
-        <List>
-          {enrollments.map((enrollment) => (
-            <ListItem key={enrollment.id}>
-              <ListItemText primary={`Student: ${enrollment.student.student_name}`} />
-              <ListItemText secondary={`Marks: ${enrollment.marks || 'Not assigned'}`} />
-              <Button variant="contained" onClick={() => handleUpdateMarks(enrollment.id)}>
-                Update Marks
-              </Button>
-            </ListItem>
-          ))}
-        </List>
-
-        {/* Display registered students for the selected course */}
-        {selectedCourseId && (
-          <div>
-            <Typography variant="h6" gutterBottom>Registered Students for the Course:</Typography>
-            <List>
-              {registeredStudents.map((student) => (
-                <ListItem key={student.id}>
-                  <ListItemText primary={`Student: ${student.student_name}`} />
-                </ListItem>
-              ))}
-            </List>
-          </div>
-        )}
-
-      {/* <Grid item xs={6}>
-        <Typography variant="h6" gutterBottom><b>Your Courses:</b></Typography>
-        <List>
-          {courses.map((course) => (
-            <ListItem key={course.user_id}>
-              <ListItemText primary={course.course_name} />
-            </ListItem>
-          ))}
-        </List>
-      </Grid>
-
-      <Grid item xs={6}>
-        <Typography variant="h6" gutterBottom>Enrollments and Marks:</Typography>
-        <List>
-          {enrollments.map((enrollment) => (
-            <ListItem key={enrollment.id}>
-              <ListItemText primary={`Student: ${enrollment.student.student_name}`} />
-              <ListItemText secondary={`Marks: ${enrollment.marks || 'Not assigned'}`} />
-              <Button variant="contained" onClick={() => handleUpdateMarks(enrollment.id)}>
-                Update Marks
-              </Button>
-            </ListItem>
-          ))}
-        </List> */}
-
         {/* Dialog for updating marks */}
       <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
         <DialogTitle>Update Marks</DialogTitle>
         <DialogContent>
           <TextField
-            label="Marks"
+            label="Marks (out of 100)"
             value={inputMarks}
             onChange={(e) => setInputMarks(e.target.value)}
           />
+          
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog} color="primary">

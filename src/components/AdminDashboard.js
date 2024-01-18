@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
     Typography,
     Button,
@@ -10,12 +10,12 @@ import {
     DialogActions,
     DialogTitle,
     DialogContent,
-    TextField,
 } from '@mui/material';
 import AddStudentForm from './AddStudentForm';
 import AddTeacherForm from './AddTeacherForm';
 import AddAdminForm from './AddAdminForm';
 import AddCourses from './AddCourses';
+import UpdateUserForm from './UpdateUserForm';
 import { toast } from 'react-toastify';
 
 const AdminDashboard = ({ user, handleLogout }) =>{
@@ -26,14 +26,14 @@ const AdminDashboard = ({ user, handleLogout }) =>{
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [deleteUserEmail, setDeleteUserEmail] = useState('');
     const [users,setUsers] = useState([]);
+    const [updatedUser, setUpdateUser] = useState(null);
+    const [showUpdateUserForm, setShowUpdateUserForm] = useState(false);
 
     const open = Boolean(anchorEl);
     const id = open ? 'add-menu-popover' : undefined;
 
     const handleAddStudent = (data) => {
-        // Perform to add student using data
         console.log('Adding student:', data);
-        // setRegistrationSuccess(true);
         setShowAddStudentForm(true);
         setAnchorEl(null);
       };
@@ -52,6 +52,46 @@ const AdminDashboard = ({ user, handleLogout }) =>{
         setAnchorEl(null);
       };
 
+      const handleUpdateUserClick = (user) => {
+        setUpdateUser(user);
+        setShowUpdateUserForm(true);
+      };
+
+      const handleUpdateUser = async (user) => {
+        try {
+          // Construct the update payload based on your server's expectations
+          const updatePayload = {
+            email: user.email,
+            password: user.password,
+            role: user.role,
+          };
+      
+          const response = await fetch(`http://localhost:3000/users/${user.email}`, {
+            method: 'PUT',
+            headers: {
+              'Authorization': `Bearer ${getToken()}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updatePayload),
+          });
+      
+          if (response.ok) {
+            console.log(`User with email ${user.email} updated successfully`);
+            toast.success(`User with email ${user.email} updated successfully`);
+            fetchUsers();
+          } else {
+            console.error(`Failed to update user with email ${user.email}`);
+            toast.error(`Failed to update user with email ${user.email}`);
+          }
+        } catch (error) {
+          console.error('Error updating user:', error);
+        } finally {
+          setUpdateUser(null);
+          setShowUpdateUserForm(false);
+        }
+      };
+
+      
       const handleClose = () => {
         setAnchorEl(null);
       };
@@ -79,15 +119,12 @@ const AdminDashboard = ({ user, handleLogout }) =>{
       };
     
       const handleConfirmDelete = (email) => {
-        // Perform the delete operation
         deleteUser(email);
         setDeleteUserEmail('')
-        // Close the dialog
         setShowDeleteDialog(false);
       };
     
       const handleCancelDelete = () => {
-        // Close the dialog
         setShowDeleteDialog(false);
       };
     
@@ -222,7 +259,7 @@ const AdminDashboard = ({ user, handleLogout }) =>{
 
       {(showAddStudentForm || showAddTeacherForm || showAddAdminForm) && (
             <Dialog open={showAddStudentForm || showAddTeacherForm || showAddAdminForm} onClose={() => handleCancel()}>
-              <DialogTitle>Add {showAddStudentForm ? 'Student' : 'Teacher'}</DialogTitle>
+              <DialogTitle>Add {showAddStudentForm ? 'Student' : showAddTeacherForm ? 'Teacher' : 'Admin' }</DialogTitle>
               <DialogContent>
                 {showAddStudentForm && <AddStudentForm onSubmit={handleAddStudent} />}
                 {showAddTeacherForm && <AddTeacherForm onSubmit={handleAddTeacher} />}
@@ -235,6 +272,7 @@ const AdminDashboard = ({ user, handleLogout }) =>{
               </DialogActions>
             </Dialog>
           )}
+
           <Button
         variant="contained"
         color="primary"
@@ -242,11 +280,28 @@ const AdminDashboard = ({ user, handleLogout }) =>{
       >
         Show All Users
       </Button>
-    <ul>
-      {users.map(user => (
-        <li key={user.id}> Email:{user.email} - Role: {user.role} </li>
-      ))}
-    </ul>
+      <ul>
+  {users.map((user) => (
+    <li key={user.id}>
+      Email: {user.email} - Role: {user.role}{' '}
+    </li>
+  ))}
+</ul>
+<Button
+        variant="outlined"
+        color="primary"
+        onClick={() => handleUpdateUserClick(user)}
+      >
+        Update
+      </Button>
+      {showUpdateUserForm && updatedUser && (
+        <UpdateUserForm
+          user={updatedUser}
+          onUpdate={(updatedUser) => handleUpdateUser(updatedUser)}
+          onCancel={() => setShowUpdateUserForm(false)}
+        />
+      )}
+
     <Button variant="contained" color="primary" onClick={handleDeleteUser}>
         Delete Users
       </Button>
