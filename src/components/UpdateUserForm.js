@@ -1,6 +1,5 @@
-// UpdateUserForm.js
 import React, { useState } from 'react';
-import { TextField } from '@mui/material';
+import { TextField, Button, Box } from '@mui/material';
 
 const UpdateUserForm = ({ onUpdate, onCancel, user }) => {
   const [email, setEmail] = useState(user.email);
@@ -18,7 +17,7 @@ const UpdateUserForm = ({ onUpdate, onCancel, user }) => {
   };
 
   return (
-    <div>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, maxWidth: 300 }}>
       <TextField
         label="Email"
         value={email}
@@ -35,9 +34,10 @@ const UpdateUserForm = ({ onUpdate, onCancel, user }) => {
         value={role}
         onChange={(e) => setRole(e.target.value)}
       />
-      <button onClick={handleSubmit}>Update User</button>
-      <button onClick={onCancel}>Cancel</button>
-    </div>
+      <Button variant="contained" onClick={handleSubmit} color="primary">
+        Update User
+      </Button>
+    </Box>
   );
 };
 

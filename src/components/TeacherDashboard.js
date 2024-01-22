@@ -12,14 +12,18 @@ import {
   FormLabel,
   Card,
   CardContent,
-  Dialog,
-  DialogActions,
-  DialogTitle,
-  DialogContent,
+  AppBar,
+  Toolbar,
+  IconButton,
 } from '@mui/material';
 
+import MenuIcon from '@mui/icons-material/Menu';
+import { Link } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import TeacherEnrollments from './TeacherEnrollments';
+import TeacherCourses from './TeacherCourses';
+import EnrolledStudents from './EnrolledStudents';
 
 const TeacherDashboard = ({ user ,handleLogout}) => {
   const [courses, setCourses] = useState([]);
@@ -97,8 +101,8 @@ const TeacherDashboard = ({ user ,handleLogout}) => {
           const coursesArray = Array.isArray(data) ? data : [data];
           setCourses(coursesArray);
         } else {
-          toast.success('Failed to fetch courses')
-          console.error('Failed to fetch courses');
+          // toast.success('Failed to fetch courses')
+          // console.error('Failed to fetch courses');
         }
       } catch (error) {
         console.error('Error:', error);
@@ -116,6 +120,7 @@ const TeacherDashboard = ({ user ,handleLogout}) => {
         if (response.ok) {
           const details = await response.json();
           setTeacherDetails(details);
+          console.log('teacherDetails:', details);
         } else {
           console.error('Failed to fetch teacher details');
         }
@@ -136,6 +141,7 @@ const TeacherDashboard = ({ user ,handleLogout}) => {
 
   const handleDialogSubmit = async () => {
     try {
+      console.log("Selected enrollment id:",selectedEnrollmentId);
       const response = await fetch(`http://localhost:3000/enrollments/${selectedEnrollmentId}`, {
         method: 'PUT',
         headers: {
@@ -310,6 +316,8 @@ const TeacherDashboard = ({ user ,handleLogout}) => {
 
 
   return (
+    <div>
+    
     <Grid container spacing={2}>
       <Grid item xs={12}>
         <Typography variant="h5" gutterBottom align="center">
@@ -320,75 +328,16 @@ const TeacherDashboard = ({ user ,handleLogout}) => {
       <Grid item xs={12}>
         {renderContent()}
       </Grid>
-
-      <Grid item xs={6}>
-        <Typography variant="h6" gutterBottom>
-          <b>Your Courses:</b>
-        </Typography>
-        <List>
-          {courses.map((course) => (
-            <div key={course.user_id}>
-              <Button
-                variant="outlined"
-                onClick={() => handleCourseClick(course.id)}
-                fullWidth
-              >
-                {course.course_name}
-              </Button>
-              {selectedCourseId === course.id && (
-                <List>
-                  {selectedCourseRegisteredStudents.map((student) => (
-                    <ListItem key={student.id}>
-                      <ListItemText primary={`Student: ${student.student_name}`} />
-                      {/* Add Update Marks button for each student */}
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={() => handleUpdateMarks(student.enrollment_id)} 
-                      >
-                        Update Marks
-                      </Button>
-                    </ListItem>
-                  ))}
-                </List>
-              )}
-            </div>
-          ))}
-        </List>
-      </Grid>
-      <Grid item xs={6}>
-        {/* Dialog for updating marks */}
-        <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
-          <DialogTitle>Update Marks</DialogTitle>
-          <DialogContent>
-            <TextField
-              label="Marks (out of 100)"
-              value={inputMarks}
-              onChange={(e) => {
-                setInputMarks(e.target.value);
-                // handleUpdateMarks(selectedEnrollmentId); // Remove this line
-              }}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseDialog} color="primary">
-              Cancel
-            </Button>
-            <Button onClick={handleDialogSubmit} color="primary">
-              Submit
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </Grid>
-
+      < TeacherCourses teacherID={teacherDetails ? teacherDetails.id : null}/>
       <Grid item xs={1}>
         <Button variant="contained" onClick={logoutHandle} fullWidth>
           Logout
         </Button>
       </Grid>
     </Grid>
+    </div>
+    
   );
 };
 export default TeacherDashboard;
-
 

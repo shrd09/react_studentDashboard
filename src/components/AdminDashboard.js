@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     Typography,
     Button,
@@ -10,13 +10,28 @@ import {
     DialogActions,
     DialogTitle,
     DialogContent,
+    AppBar,
+    Toolbar,
+    Table,
+    TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TablePagination,
+  Select,
+    MenuItem,
+
 } from '@mui/material';
 import AddStudentForm from './AddStudentForm';
 import AddTeacherForm from './AddTeacherForm';
 import AddAdminForm from './AddAdminForm';
-import AddCourses from './AddCourses';
 import UpdateUserForm from './UpdateUserForm';
+import AddCourse from './AddCourse';
 import { toast } from 'react-toastify';
+import DeleteCourse from './DeleteCourse';
+import AssignCourseToTeacher from './AssignCourseToTeacher';
+
 
 const AdminDashboard = ({ user, handleLogout }) =>{
     const [anchorEl, setAnchorEl] = useState(null);
@@ -28,6 +43,55 @@ const AdminDashboard = ({ user, handleLogout }) =>{
     const [users,setUsers] = useState([]);
     const [updatedUser, setUpdateUser] = useState(null);
     const [showUpdateUserForm, setShowUpdateUserForm] = useState(false);
+    const [showAllUsers, setShowAllUsers] = useState(false);
+    const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [selectedOption, setSelectedOption] = useState('');
+
+
+  const handleOptionChange = (event) => {
+    const selectedValue = event.target.value;
+  
+    // Reset state variables when changing options
+    setShowAllUsers(false);
+    setUpdateUser(null);
+    setShowUpdateUserForm(false);
+  
+  
+    // Set the selected option
+    setSelectedOption(selectedValue);
+  
+    // Additional logic if needed based on the selected option
+    switch (selectedValue) {
+      case 'showAllUsers':
+        setShowAllUsers(true);
+        break;
+      case 'updateUser':
+        handleUpdateUserClick(user);
+        break;
+      case 'deleteUsers':
+        handleDeleteUser();
+        break;
+      // Add cases for other options if needed
+      default:
+        break;
+    }
+  };
+  
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  useEffect(() => {
+    if (showAllUsers) {
+      fetchUsers();
+    }
+  }, [showAllUsers]);
 
     const open = Boolean(anchorEl);
     const id = open ? 'add-menu-popover' : undefined;
@@ -111,7 +175,8 @@ const AdminDashboard = ({ user, handleLogout }) =>{
       };
 
       const handleShowAllUsers = () => {
-        fetchUsers();
+        console.log("Fetching all users...");
+        setShowAllUsers(true);
       };
 
       const handleDeleteUser = () => {
@@ -181,73 +246,79 @@ const AdminDashboard = ({ user, handleLogout }) =>{
         }
       };
 
-
-    return (
+      return (
         <div>
-      <Grid item xs={12}>
-        <Typography variant="h4" gutterBottom align="center">
-          Welcome, Admin!
-        </Typography>
-      </Grid>
-      <br />
-      <Grid container spacing={2} justifyContent="center" alignItems="center">
-        <Button
-          aria-describedby={id}
-          variant="contained"
-          color="inherit"
-          onClick={handleClick}
-        >
-          Add
-        </Button>
-      </Grid>
-      <Popover
-        id={id}
-        open={open}
-        anchorEl={anchorEl}
-        onClose={handleClose}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'center',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'center',
-        }}
-      >
-        <Paper>
-          <Button
-            fullWidth
-            variant="outlined"
-            color="inherit"
-            onClick={handleAddStudent}
-          >
-            Add Student
-          </Button>
-          <Button
-            fullWidth
-            variant="outlined"
-            color="inherit"
-            onClick={handleAddTeacher}
-          >
-            Add Teacher
-          </Button>
-          <Button
-            fullWidth
-            variant="outlined"
-            color="inherit"
-            onClick={handleAddAdmin}
-          >
-            Add Admin
-          </Button>
-        </Paper>
-        <AddCourses fetchTeachers={fetchUsers} />
-      </Popover>
-      <br />
-      <br />
-      <Grid container spacing={2} justifyContent="center" alignItems="center">
-        
-      </Grid>
-
+          <AppBar position="static">
+            <Toolbar>
+              <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                Admin Dashboard
+              </Typography>
+              <Select value={selectedOption} onChange={handleOptionChange}>
+            <MenuItem value="">Select Option</MenuItem>
+            <MenuItem value="showAllUsers">Show All Users</MenuItem>
+            <MenuItem value="updateUser">Update User</MenuItem>
+            <MenuItem value="deleteUsers">Delete Users</MenuItem>
+            <MenuItem value="addCourse">Add Course</MenuItem>
+            <MenuItem value="assignCourse">Assign Course to Teacher</MenuItem>
+          </Select>
+              <Button color="inherit" onClick={handleLogout}>
+                Logout
+              </Button>
+              <Button
+                color="inherit"
+                onClick={handleClick}
+                aria-describedby={id}
+              >
+                Add User
+              </Button>
+              <Popover
+                id={id}
+                open={open}
+                anchorEl={anchorEl}
+                onClose={() => setAnchorEl(null)}
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'center',
+                }}
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'center',
+                }}
+              >
+                <Paper sx={{ padding: 2 }}>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    size="small"
+                    onClick={handleAddStudent}
+                    sx={{ marginBottom: 1 }}
+                  >
+                    Add Student
+                  </Button>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    color="primary"
+                    size="small"
+                    onClick={handleAddTeacher}
+                    sx={{ marginBottom: 1 }}
+                  >
+                    Add Teacher
+                  </Button>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    color="primary"
+                    size="small"
+                    onClick={handleAddAdmin}
+                  >
+                    Add Admin
+                  </Button>
+                </Paper>
+              </Popover>
+            </Toolbar>
+          </AppBar>
+    
       {(showAddStudentForm || showAddTeacherForm || showAddAdminForm) && (
             <Dialog open={showAddStudentForm || showAddTeacherForm || showAddAdminForm} onClose={() => handleCancel()}>
               <DialogTitle>Add {showAddStudentForm ? 'Student' : showAddTeacherForm ? 'Teacher' : 'Admin' }</DialogTitle>
@@ -263,42 +334,62 @@ const AdminDashboard = ({ user, handleLogout }) =>{
               </DialogActions>
             </Dialog>
           )}
-
-          <Button
-        variant="outlined"
-        color="inherit"
-        onClick={handleShowAllUsers}
-      >
-        Show All Users
-      </Button>
-      <ul>
-        {users.map((user) => (
-          <li key={user.id}>
-            <b>Email:</b> <i>{user.email}</i> - <b>Role:</b> <i>{user.role}</i>{' '}
-          </li>
-        ))}
-      </ul>
-      <Button
-        variant="outlined"
-        color="inherit"
-        onClick={() => handleUpdateUserClick(user)}
-      >
-        Update
-      </Button>
-      <br/>
-      <br/>
-      {showUpdateUserForm && updatedUser && (
-        <UpdateUserForm
-          user={updatedUser}
-          onUpdate={(updatedUser) => handleUpdateUser(updatedUser)}
-          onCancel={() => setShowUpdateUserForm(false)}
+          
+          {selectedOption === 'showAllUsers' && showAllUsers && (
+      <div>
+        <TableContainer component={Paper} sx={{ marginTop: 2 }}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Email</TableCell>
+                <TableCell>Role</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {(rowsPerPage > 0
+                ? users.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                : users
+              ).map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>{user.role}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 25]}
+          component="div"
+          count={users.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
         />
-      )}
+      </div>
+    )}
 
-<Button variant="outlined" color="inherit" onClick={handleDeleteUser}>
-        Delete Users
-      </Button>
-    <Dialog open={showDeleteDialog} onClose={handleCancelDelete}>
+
+{selectedOption === 'updateUser' && (
+  <div>
+    {/* Render Update User information or trigger the update process */}
+    {updatedUser && (
+      <UpdateUserForm
+        user={updatedUser}
+        onUpdate={(updatedUser) => handleUpdateUser(updatedUser)}
+        onCancel={() => setShowUpdateUserForm(false)}
+      />
+    )}
+  </div>
+)}
+
+
+{selectedOption === 'deleteUsers' && (
+  <div>
+    {/* Render Delete Users information or trigger the delete process */}
+    {showDeleteDialog && (
+      <Dialog open={showDeleteDialog} onClose={handleCancelDelete}>
         <DialogTitle>Delete User</DialogTitle>
         <DialogContent>
           <Typography>Enter the email of the user you want to delete:</Typography>
@@ -312,21 +403,31 @@ const AdminDashboard = ({ user, handleLogout }) =>{
           <Button onClick={handleCancelDelete} color="secondary">
             Cancel
           </Button>
-          <Button onClick={()=>handleConfirmDelete(deleteUserEmail)} color="primary">
+          <Button onClick={() => handleConfirmDelete(deleteUserEmail)} color="primary">
             Confirm Delete
           </Button>
         </DialogActions>
       </Dialog>
-      <Grid item xs={1}>
-      <br/>
-          <Button
-            variant="outlined"
-            color="inherit"
-            onClick={handleLogout}
-          >
-            Logout
-          </Button>
-        </Grid>
+    )}
+  </div>
+)}
+
+{selectedOption === 'addCourse' && (
+  <div>
+        <AddCourse />
+        </div>
+)}
+
+
+{selectedOption === 'assignCourse' && (
+  <div>
+    <AssignCourseToTeacher />
+    </div>
+)}
+
+<Typography variant="h4" gutterBottom>
+      <b>Welcome admin!!</b>
+    </Typography>
     </div>
     );
 };

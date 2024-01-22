@@ -60,13 +60,21 @@ const Login = ({ onLogin }) => {
           'Authorization': `Bearer ${getToken()}`,
         },
       });
-
-      if (response.ok) {
+  
+      if (!response.ok) {
+        console.error(`Failed to fetch user role. Status: ${response.status}`);
+        return null;
+      }
+  
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
         const data = await response.json();
         setRole(data.role);
+        console.log("Role is here:", role);
         return data.role;
       } else {
-        console.error('Failed to fetch user role');
+        console.error('Unexpected response content type:', contentType);
+        console.error('Response body:', await response.text());
         return null;
       }
     } catch (error) {
@@ -74,6 +82,8 @@ const Login = ({ onLogin }) => {
       return null;
     }
   };
+  
+  
 
 
   const handleSubmit = async (e) => {
